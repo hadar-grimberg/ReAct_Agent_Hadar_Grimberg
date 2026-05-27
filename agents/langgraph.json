@@ -1,0 +1,9 @@
+{
+  "$schema": "https://langgra.ph/schema.json",
+  "dependencies": [".", "./src/agent"],
+  "graphs": {
+    "agent": "./src/agent/agent.py:react_agent"
+  },
+  "env": "C:\\Users\\hadar\\code\\NebiusChallenge\\AI_product\\Assignment3\\agents\\.env",
+  "image_distro": "wolfi"
+}

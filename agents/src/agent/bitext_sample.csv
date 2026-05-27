@@ -1,0 +1,453 @@
+flags,instruction,category,intent,response
+BIC,Quick question: i'm very dissatisfied with the service,FEEDBACK,complaint,I sincerely apologize for the inconvenience you've experienced. Your feedback is very important to us. Let me escalate this to our team immediately.
+BIC,"Hi, can i track my shipment?",SHIPPING,delivery_period,Thank you for contacting us. Let me assist you with that right away.
+BIC,how do i delete my account?,ACCOUNT,registration_problems,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - can i switch to a different account?,ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i need to cancel order #12345",ORDER,track_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,i was charged the wrong amount,PAYMENT,payment_issue,I'm sorry you're experiencing payment issues. Could you please describe the error you're seeing? I'll do my best to help resolve this quickly.
+BIC,"Hi, my package was delivered to the wrong address",SHIPPING,track_shipment,"To track your shipment, please visit our tracking page and enter your tracking number. You can find it in your confirmation email."
+BIC,can you process a refund for order #67890?,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: i want to create a new account,ACCOUNT,create_account,I'd be happy to help you create a new account! Please visit our website and click 'Sign Up'. You'll need to provide your email address and create a password.
+BIC,please cancel my service immediately,CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: can you process a refund for order #67890?,REFUND,get_refund,I'll be happy to help you with a refund. Refunds are typically processed within 3-5 business days. Could you please provide your order number?
+BIC,Urgent: i haven't received my refund,REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: i want to report a problem,FEEDBACK,review,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i'd like to stop my recurring payments",CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,i want a refund for my purchase,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - i'd like to compliment your customer service,FEEDBACK,complaint,I sincerely apologize for the inconvenience you've experienced. Your feedback is very important to us. Let me escalate this to our team immediately.
+BIC,"Hi, i need to update my profile",ACCOUNT,registration_problems,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: can you process a refund for order #67890?,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: my account was hacked,ACCOUNT,edit_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, where is my order?",ORDER,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,I need help - my order is missing an item,ORDER,place_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: my account was hacked,ACCOUNT,edit_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,my package was delivered to the wrong address,SHIPPING,track_shipment,"To track your shipment, please visit our tracking page and enter your tracking number. You can find it in your confirmation email."
+BIC,Urgent: how do i change my username?,ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i'm having trouble making a payment",PAYMENT,check_payment_methods,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: my order hasn't arrived yet,ORDER,order_not_arrived,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: how do i delete my account?,ACCOUNT,delete_account,"I understand you'd like to delete your account. Please note that this action is permanent. To proceed, go to Settings > Account > Delete Account."
+BIC,I need help - i'd like to compliment your customer service,FEEDBACK,satisfaction_rating,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: my refund is taking too long,REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: your agent was very helpful,FEEDBACK,review,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, your service was terrible",FEEDBACK,complaint,I sincerely apologize for the inconvenience you've experienced. Your feedback is very important to us. Let me escalate this to our team immediately.
+BIC,"Hi, where is my order?",ORDER,change_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: i'm cancelling because the price is too high,CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,i need to cancel order #12345,ORDER,change_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,my order hasn't arrived yet,ORDER,track_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - i need to update my profile,ACCOUNT,recover_password,Thank you for contacting us. Let me assist you with that right away.
+BIC,how can i leave a review?,FEEDBACK,satisfaction_rating,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: i want a refund for my purchase,REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - i'm having trouble registering,ACCOUNT,recover_password,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: how long will my order take?,ORDER,track_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i'd like to stop my recurring payments",CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, your agent was very helpful",FEEDBACK,review,Thank you for contacting us. Let me assist you with that right away.
+BIC,your agent was very helpful,FEEDBACK,complaint,I sincerely apologize for the inconvenience you've experienced. Your feedback is very important to us. Let me escalate this to our team immediately.
+BIC,Quick question: i'm cancelling because the price is too high,CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,can i pay with paypal?,PAYMENT,pay_bill,Thank you for contacting us. Let me assist you with that right away.
+BIC,i need to cancel order #12345,ORDER,change_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: my package was delivered to the wrong address,SHIPPING,delivery_options,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, i forgot my password",ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: can i change my order?,ORDER,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,Quick question: i want to cancel my subscription,CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i'm cancelling because the price is too high",CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, my order hasn't arrived yet",ORDER,change_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: how much does shipping cost?,SHIPPING,track_shipment,"To track your shipment, please visit our tracking page and enter your tracking number. You can find it in your confirmation email."
+BIC,i need to cancel order #12345,ORDER,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,"Hello, i'd like to stop my recurring payments",CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,"Hi, my package was delivered to the wrong address",SHIPPING,change_shipping_address,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - can i track my shipment?,SHIPPING,track_shipment,"To track your shipment, please visit our tracking page and enter your tracking number. You can find it in your confirmation email."
+BIC,"Hi, i'm cancelling because the price is too high",CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,where is my order?,ORDER,change_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: what is your refund policy?,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,i'd like to place a new order,ORDER,order_not_arrived,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, please cancel my service immediately",CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,Quick question: can i pay with paypal?,PAYMENT,pay_bill,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: how long does shipping take?,SHIPPING,delivery_period,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, i'm cancelling because the price is too high",CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,i forgot my password,ACCOUNT,delete_account,"I understand you'd like to delete your account. Please note that this action is permanent. To proceed, go to Settings > Account > Delete Account."
+BIC,Quick question: i need to cancel order #12345,ORDER,place_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, i want to cancel my subscription",CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, can i modify the items in my order?",ORDER,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,my order is missing an item,ORDER,change_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i need to update my profile",ACCOUNT,edit_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: how do i cancel my membership?,CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,"Hi, how do i cancel my membership?",CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,I need help - i want to close my account permanently,ACCOUNT,delete_account,"I understand you'd like to delete your account. Please note that this action is permanent. To proceed, go to Settings > Account > Delete Account."
+BIC,Urgent: i want to close my account permanently,ACCOUNT,delete_account,"I understand you'd like to delete your account. Please note that this action is permanent. To proceed, go to Settings > Account > Delete Account."
+BIC,I need help - how do i cancel my membership?,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,Quick question: how long does shipping take?,SHIPPING,delivery_options,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, where is my order?",ORDER,change_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: i want to cancel my order,ORDER,order_not_arrived,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, i'd like to place a new order",ORDER,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,"Hello, can i pay with paypal?",PAYMENT,wrong_amount_charged,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, i need to pay my bill",PAYMENT,check_payment_methods,Thank you for contacting us. Let me assist you with that right away.
+BIC,can i pause my subscription instead?,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,"Hello, i want to report a problem",FEEDBACK,satisfaction_rating,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: i want to cancel my subscription,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,i'd like to compliment your customer service,FEEDBACK,complaint,I sincerely apologize for the inconvenience you've experienced. Your feedback is very important to us. Let me escalate this to our team immediately.
+BIC,Quick question: how long does shipping take?,SHIPPING,delivery_period,Thank you for contacting us. Let me assist you with that right away.
+BIC,i'm cancelling because the price is too high,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,Quick question: can i pay with paypal?,PAYMENT,pay_bill,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - can you process a refund for order #67890?,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,i'd like to stop my recurring payments,CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,"Hi, how long will my order take?",ORDER,order_not_arrived,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, i want to report a problem",FEEDBACK,review,Thank you for contacting us. Let me assist you with that right away.
+BIC,my order is missing an item,ORDER,track_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - i'm having trouble making a payment,PAYMENT,check_payment_methods,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: can i pay with paypal?,PAYMENT,wrong_amount_charged,Thank you for contacting us. Let me assist you with that right away.
+BIC,i need to cancel order #12345,ORDER,change_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, my order hasn't arrived yet",ORDER,change_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: my refund is taking too long,REFUND,get_refund,I'll be happy to help you with a refund. Refunds are typically processed within 3-5 business days. Could you please provide your order number?
+BIC,"Hi, i haven't received my refund",REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: when will i get my refund?,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: how do i update my payment information?,PAYMENT,check_payment_methods,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, please cancel my service immediately",CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, can i switch to a different account?",ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, can i pause my subscription instead?",CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,I need help - i want to cancel my subscription,CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,Urgent: your agent was very helpful,FEEDBACK,satisfaction_rating,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: i want to create a new account,ACCOUNT,registration_problems,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: i want to report a problem,FEEDBACK,satisfaction_rating,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - how long will my order take?,ORDER,track_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - please cancel my service immediately,CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: when will i get my refund?,REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: i see an unauthorized charge,PAYMENT,payment_issue,I'm sorry you're experiencing payment issues. Could you please describe the error you're seeing? I'll do my best to help resolve this quickly.
+BIC,"Hello, can i switch to a different account?",ACCOUNT,create_account,I'd be happy to help you create a new account! Please visit our website and click 'Sign Up'. You'll need to provide your email address and create a password.
+BIC,Urgent: my refund is taking too long,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i want to cancel my subscription",CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,"Hello, i want to create a new account",ACCOUNT,create_account,I'd be happy to help you create a new account! Please visit our website and click 'Sign Up'. You'll need to provide your email address and create a password.
+BIC,"Hello, what are my delivery options?",SHIPPING,delivery_options,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - how long does shipping take?,SHIPPING,change_shipping_address,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - what is your refund policy?,REFUND,get_refund,I'll be happy to help you with a refund. Refunds are typically processed within 3-5 business days. Could you please provide your order number?
+BIC,Urgent: how can i leave a review?,FEEDBACK,review,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - what are my delivery options?,SHIPPING,change_shipping_address,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: what is your refund policy?,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - how do i change my username?,ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: how long does shipping take?,SHIPPING,change_shipping_address,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: your agent was very helpful,FEEDBACK,complaint,I sincerely apologize for the inconvenience you've experienced. Your feedback is very important to us. Let me escalate this to our team immediately.
+BIC,Urgent: i'm cancelling because the price is too high,CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: how do i change my username?,ACCOUNT,delete_account,"I understand you'd like to delete your account. Please note that this action is permanent. To proceed, go to Settings > Account > Delete Account."
+BIC,I need help - how do i update my payment information?,PAYMENT,pay_bill,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: when will i get my refund?,REFUND,get_refund,I'll be happy to help you with a refund. Refunds are typically processed within 3-5 business days. Could you please provide your order number?
+BIC,"I need help - i was charged twice, please refund me",REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, can you process a refund for order #67890?",REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: where is my order?,ORDER,place_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: what is your refund policy?,REFUND,get_refund,I'll be happy to help you with a refund. Refunds are typically processed within 3-5 business days. Could you please provide your order number?
+BIC,"Hello, what are my delivery options?",SHIPPING,delivery_period,Thank you for contacting us. Let me assist you with that right away.
+BIC,how do i change my username?,ACCOUNT,registration_problems,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: how do i update my payment information?,PAYMENT,pay_bill,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: i want to cancel my subscription,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,"Hello, where is my order?",ORDER,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,my account was hacked,ACCOUNT,create_account,I'd be happy to help you create a new account! Please visit our website and click 'Sign Up'. You'll need to provide your email address and create a password.
+BIC,Quick question: where is my order?,ORDER,place_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i need to update my profile",ACCOUNT,edit_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,can you process a refund for order #67890?,REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: can i change my order?,ORDER,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,"i was charged twice, please refund me",REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: i want to leave feedback about my experience,FEEDBACK,review,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: i need to cancel order #12345,ORDER,order_not_arrived,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: where is my order?,ORDER,order_not_arrived,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: can i change my order?,ORDER,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,I need help - how do i delete my account?,ACCOUNT,recover_password,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i was charged twice, please refund me",REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: i want to close my account permanently,ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: how do i update my payment information?,PAYMENT,check_payment_methods,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, i want to leave feedback about my experience",FEEDBACK,review,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: how do i cancel my membership?,CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,Quick question: my refund is taking too long,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - please cancel my service immediately,CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i want to create a new account",ACCOUNT,delete_account,"I understand you'd like to delete your account. Please note that this action is permanent. To proceed, go to Settings > Account > Delete Account."
+BIC,"Hello, please cancel my service immediately",CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,Urgent: how can i leave a review?,FEEDBACK,complaint,I sincerely apologize for the inconvenience you've experienced. Your feedback is very important to us. Let me escalate this to our team immediately.
+BIC,"Hello, how do i cancel my membership?",CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,how do i cancel my membership?,CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: what are my delivery options?,SHIPPING,change_shipping_address,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: please cancel my service immediately,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,"Hello, how can i leave a review?",FEEDBACK,review,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: can you process a refund for order #67890?,REFUND,get_refund,I'll be happy to help you with a refund. Refunds are typically processed within 3-5 business days. Could you please provide your order number?
+BIC,"Hello, can i pause my subscription instead?",CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,when will i get my refund?,REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, my refund is taking too long",REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,can i change my order?,ORDER,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,I need help - do you offer express delivery?,SHIPPING,track_shipment,"To track your shipment, please visit our tracking page and enter your tracking number. You can find it in your confirmation email."
+BIC,can i modify the items in my order?,ORDER,track_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, my package was delivered to the wrong address",SHIPPING,track_shipment,"To track your shipment, please visit our tracking page and enter your tracking number. You can find it in your confirmation email."
+BIC,Quick question: when will i get my refund?,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,how do i delete my account?,ACCOUNT,delete_account,"I understand you'd like to delete your account. Please note that this action is permanent. To proceed, go to Settings > Account > Delete Account."
+BIC,Quick question: i have a complaint about my order,FEEDBACK,review,Thank you for contacting us. Let me assist you with that right away.
+BIC,i want to cancel my order,ORDER,place_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,i'm very dissatisfied with the service,FEEDBACK,satisfaction_rating,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, can you process a refund for order #67890?",REFUND,get_refund,I'll be happy to help you with a refund. Refunds are typically processed within 3-5 business days. Could you please provide your order number?
+BIC,Urgent: can i pay with paypal?,PAYMENT,check_payment_methods,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: how do i delete my account?,ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - how can i leave a review?,FEEDBACK,satisfaction_rating,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, can i pause my subscription instead?",CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,"Hi, i'm having trouble making a payment",PAYMENT,check_payment_methods,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Quick question: i was charged twice, please refund me",REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - when will i get my refund?,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,i see an unauthorized charge,PAYMENT,pay_bill,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, my package was delivered to the wrong address",SHIPPING,change_shipping_address,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - i haven't received my refund,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, how do i delete my account?",ACCOUNT,create_account,I'd be happy to help you create a new account! Please visit our website and click 'Sign Up'. You'll need to provide your email address and create a password.
+BIC,Quick question: my package was delivered to the wrong address,SHIPPING,track_shipment,"To track your shipment, please visit our tracking page and enter your tracking number. You can find it in your confirmation email."
+BIC,Quick question: please cancel my service immediately,CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: please cancel my service immediately,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,"Hello, i'd like to stop my recurring payments",CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,i haven't received my refund,REFUND,get_refund,I'll be happy to help you with a refund. Refunds are typically processed within 3-5 business days. Could you please provide your order number?
+BIC,can i pay with paypal?,PAYMENT,payment_issue,I'm sorry you're experiencing payment issues. Could you please describe the error you're seeing? I'll do my best to help resolve this quickly.
+BIC,Urgent: how long will my order take?,ORDER,order_not_arrived,Thank you for contacting us. Let me assist you with that right away.
+BIC,i need to cancel order #12345,ORDER,change_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: i want to cancel my order,ORDER,order_not_arrived,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: can i pay with paypal?,PAYMENT,wrong_amount_charged,Thank you for contacting us. Let me assist you with that right away.
+BIC,my package was delivered to the wrong address,SHIPPING,track_shipment,"To track your shipment, please visit our tracking page and enter your tracking number. You can find it in your confirmation email."
+BIC,Urgent: can i switch to a different account?,ACCOUNT,registration_problems,Thank you for contacting us. Let me assist you with that right away.
+BIC,can i change my order?,ORDER,order_not_arrived,Thank you for contacting us. Let me assist you with that right away.
+BIC,my account was hacked,ACCOUNT,registration_problems,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, my order is missing an item",ORDER,order_not_arrived,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i want to create a new account",ACCOUNT,edit_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: can i pick up my order in store?,SHIPPING,track_shipment,"To track your shipment, please visit our tracking page and enter your tracking number. You can find it in your confirmation email."
+BIC,"Hello, my package was delivered to the wrong address",SHIPPING,track_shipment,"To track your shipment, please visit our tracking page and enter your tracking number. You can find it in your confirmation email."
+BIC,Quick question: i'm having trouble registering,ACCOUNT,registration_problems,Thank you for contacting us. Let me assist you with that right away.
+BIC,where is my order?,ORDER,track_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: can you process a refund for order #67890?,REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: i haven't received my refund,REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, can i change my order?",ORDER,change_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i want to cancel my subscription",CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,"Hello, your agent was very helpful",FEEDBACK,satisfaction_rating,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: can i pay with paypal?,PAYMENT,pay_bill,Thank you for contacting us. Let me assist you with that right away.
+BIC,i need to pay my bill,PAYMENT,wrong_amount_charged,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - my order hasn't arrived yet,ORDER,track_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - i want to cancel my subscription,CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: i need to update my profile,ACCOUNT,delete_account,"I understand you'd like to delete your account. Please note that this action is permanent. To proceed, go to Settings > Account > Delete Account."
+BIC,"Hello, what are my delivery options?",SHIPPING,delivery_options,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - how do i cancel my membership?,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,"Hello, i'd like to place a new order",ORDER,order_not_arrived,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: please cancel my service immediately,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,Quick question: my credit card was declined,PAYMENT,payment_issue,I'm sorry you're experiencing payment issues. Could you please describe the error you're seeing? I'll do my best to help resolve this quickly.
+BIC,I need help - can i modify the items in my order?,ORDER,track_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, can i pause my subscription instead?",CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,Urgent: i'm having trouble registering,ACCOUNT,delete_account,"I understand you'd like to delete your account. Please note that this action is permanent. To proceed, go to Settings > Account > Delete Account."
+BIC,Urgent: i'm very dissatisfied with the service,FEEDBACK,review,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i was charged the wrong amount",PAYMENT,pay_bill,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, when will i get my refund?",REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: i'm having trouble registering,ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i want to close my account permanently",ACCOUNT,create_account,I'd be happy to help you create a new account! Please visit our website and click 'Sign Up'. You'll need to provide your email address and create a password.
+BIC,Urgent: i'm having trouble registering,ACCOUNT,create_account,I'd be happy to help you create a new account! Please visit our website and click 'Sign Up'. You'll need to provide your email address and create a password.
+BIC,Quick question: i'm cancelling because the price is too high,CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, what payment methods do you accept?",PAYMENT,pay_bill,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, i need to cancel order #12345",ORDER,change_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,my order is missing an item,ORDER,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,Quick question: how do i cancel my membership?,CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, my account was hacked",ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, i'd like to compliment your customer service",FEEDBACK,review,Thank you for contacting us. Let me assist you with that right away.
+BIC,"i was charged twice, please refund me",REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: i'd like to place a new order,ORDER,place_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: my order hasn't arrived yet,ORDER,order_not_arrived,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, can i modify the items in my order?",ORDER,track_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: can i pay with paypal?,PAYMENT,pay_bill,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, i'm having trouble making a payment",PAYMENT,pay_bill,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: your agent was very helpful,FEEDBACK,satisfaction_rating,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: i need to update my profile,ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, i want to cancel my subscription",CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,"Hi, how long will my order take?",ORDER,order_not_arrived,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i forgot my password",ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,i want to cancel my order,ORDER,place_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: can you process a refund for order #67890?,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - how do i update my payment information?,PAYMENT,check_payment_methods,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, do you offer express delivery?",SHIPPING,track_shipment,"To track your shipment, please visit our tracking page and enter your tracking number. You can find it in your confirmation email."
+BIC,Urgent: how can i leave a review?,FEEDBACK,satisfaction_rating,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - can i pick up my order in store?,SHIPPING,change_shipping_address,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, i need to change my shipping address",SHIPPING,delivery_options,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: when will i get my refund?,REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: my refund is taking too long,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - can i pay with paypal?,PAYMENT,check_payment_methods,Thank you for contacting us. Let me assist you with that right away.
+BIC,please cancel my service immediately,CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,"Hi, can i switch to a different account?",ACCOUNT,edit_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: my credit card was declined,PAYMENT,payment_issue,I'm sorry you're experiencing payment issues. Could you please describe the error you're seeing? I'll do my best to help resolve this quickly.
+BIC,I need help - can i pause my subscription instead?,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,i see an unauthorized charge,PAYMENT,wrong_amount_charged,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - i want to report a problem,FEEDBACK,complaint,I sincerely apologize for the inconvenience you've experienced. Your feedback is very important to us. Let me escalate this to our team immediately.
+BIC,I need help - your service was terrible,FEEDBACK,complaint,I sincerely apologize for the inconvenience you've experienced. Your feedback is very important to us. Let me escalate this to our team immediately.
+BIC,i see an unauthorized charge,PAYMENT,payment_issue,I'm sorry you're experiencing payment issues. Could you please describe the error you're seeing? I'll do my best to help resolve this quickly.
+BIC,"Hi, i haven't received my refund",REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, how long will my order take?",ORDER,order_not_arrived,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, my refund is taking too long",REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i want to report a problem",FEEDBACK,review,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, i haven't received my refund",REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,what is your refund policy?,REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: can i pause my subscription instead?,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,Urgent: your service was terrible,FEEDBACK,review,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - your agent was very helpful,FEEDBACK,review,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: please cancel my service immediately,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,Urgent: i want to create a new account,ACCOUNT,edit_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, i want to cancel my subscription",CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,I need help - how do i cancel my membership?,CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,Urgent: i forgot my password,ACCOUNT,registration_problems,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, i see an unauthorized charge",PAYMENT,wrong_amount_charged,Thank you for contacting us. Let me assist you with that right away.
+BIC,i want to close my account permanently,ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, please cancel my service immediately",CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,I need help - i'd like to compliment your customer service,FEEDBACK,review,Thank you for contacting us. Let me assist you with that right away.
+BIC,i want a refund for my purchase,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, my order is missing an item",ORDER,place_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,my order is missing an item,ORDER,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,"Hello, how do i delete my account?",ACCOUNT,recover_password,Thank you for contacting us. Let me assist you with that right away.
+BIC,my order is missing an item,ORDER,track_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,i'd like to stop my recurring payments,CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,can i pay with paypal?,PAYMENT,pay_bill,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, can i pay with paypal?",PAYMENT,wrong_amount_charged,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: i haven't received my refund,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, how long will my order take?",ORDER,place_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,i see an unauthorized charge,PAYMENT,wrong_amount_charged,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: where is my order?,ORDER,place_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, your agent was very helpful",FEEDBACK,complaint,I sincerely apologize for the inconvenience you've experienced. Your feedback is very important to us. Let me escalate this to our team immediately.
+BIC,"Hi, what is your refund policy?",REFUND,get_refund,I'll be happy to help you with a refund. Refunds are typically processed within 3-5 business days. Could you please provide your order number?
+BIC,I need help - i'm very dissatisfied with the service,FEEDBACK,complaint,I sincerely apologize for the inconvenience you've experienced. Your feedback is very important to us. Let me escalate this to our team immediately.
+BIC,"Hello, i haven't received my refund",REFUND,get_refund,I'll be happy to help you with a refund. Refunds are typically processed within 3-5 business days. Could you please provide your order number?
+BIC,Urgent: i want to cancel my subscription,CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,Quick question: i'd like to place a new order,ORDER,track_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: can i pick up my order in store?,SHIPPING,delivery_period,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: i need to update my profile,ACCOUNT,registration_problems,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: where is my order?,ORDER,order_not_arrived,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, how much does shipping cost?",SHIPPING,delivery_period,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i need to pay my bill",PAYMENT,payment_issue,I'm sorry you're experiencing payment issues. Could you please describe the error you're seeing? I'll do my best to help resolve this quickly.
+BIC,i want to close my account permanently,ACCOUNT,delete_account,"I understand you'd like to delete your account. Please note that this action is permanent. To proceed, go to Settings > Account > Delete Account."
+BIC,Urgent: can you process a refund for order #67890?,REFUND,get_refund,I'll be happy to help you with a refund. Refunds are typically processed within 3-5 business days. Could you please provide your order number?
+BIC,"Hello, can you process a refund for order #67890?",REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,i see an unauthorized charge,PAYMENT,payment_issue,I'm sorry you're experiencing payment issues. Could you please describe the error you're seeing? I'll do my best to help resolve this quickly.
+BIC,I need help - can i modify the items in my order?,ORDER,change_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, how do i cancel my membership?",CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,I need help - when will i get my refund?,REFUND,get_refund,I'll be happy to help you with a refund. Refunds are typically processed within 3-5 business days. Could you please provide your order number?
+BIC,"Hello, i was charged twice, please refund me",REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: what is your refund policy?,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,how do i change my username?,ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: i want to cancel my subscription,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,i see an unauthorized charge,PAYMENT,wrong_amount_charged,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: can i pay with paypal?,PAYMENT,check_payment_methods,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, i'm cancelling because the price is too high",CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, my account was hacked",ACCOUNT,recover_password,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, i was charged the wrong amount",PAYMENT,payment_issue,I'm sorry you're experiencing payment issues. Could you please describe the error you're seeing? I'll do my best to help resolve this quickly.
+BIC,i want to cancel my subscription,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,when will i get my refund?,REFUND,get_refund,I'll be happy to help you with a refund. Refunds are typically processed within 3-5 business days. Could you please provide your order number?
+BIC,Quick question: i'm having trouble registering,ACCOUNT,registration_problems,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - what is your refund policy?,REFUND,get_refund,I'll be happy to help you with a refund. Refunds are typically processed within 3-5 business days. Could you please provide your order number?
+BIC,i want to close my account permanently,ACCOUNT,edit_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,i want to create a new account,ACCOUNT,create_account,I'd be happy to help you create a new account! Please visit our website and click 'Sign Up'. You'll need to provide your email address and create a password.
+BIC,Urgent: how do i change my username?,ACCOUNT,recover_password,Thank you for contacting us. Let me assist you with that right away.
+BIC,i'm having trouble registering,ACCOUNT,recover_password,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, what are my delivery options?",SHIPPING,delivery_options,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, how do i change my username?",ACCOUNT,edit_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - when will i get my refund?,REFUND,get_refund,I'll be happy to help you with a refund. Refunds are typically processed within 3-5 business days. Could you please provide your order number?
+BIC,I need help - my order is missing an item,ORDER,place_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - your service was terrible,FEEDBACK,complaint,I sincerely apologize for the inconvenience you've experienced. Your feedback is very important to us. Let me escalate this to our team immediately.
+BIC,Urgent: i'd like to stop my recurring payments,CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,"Hello, what is your refund policy?",REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: how do i delete my account?,ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,can you process a refund for order #67890?,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - i haven't received my refund,REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: i'd like to compliment your customer service,FEEDBACK,complaint,I sincerely apologize for the inconvenience you've experienced. Your feedback is very important to us. Let me escalate this to our team immediately.
+BIC,Quick question: can you process a refund for order #67890?,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i was charged twice, please refund me",REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - i want to cancel my order,ORDER,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,Quick question: i'm cancelling because the price is too high,CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: i want to report a problem,FEEDBACK,satisfaction_rating,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, i'm cancelling because the price is too high",CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,Quick question: can i pay with paypal?,PAYMENT,wrong_amount_charged,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: i have a complaint about my order,FEEDBACK,complaint,I sincerely apologize for the inconvenience you've experienced. Your feedback is very important to us. Let me escalate this to our team immediately.
+BIC,"Hi, i want to leave feedback about my experience",FEEDBACK,review,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i'm cancelling because the price is too high",CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,"Hello, how do i delete my account?",ACCOUNT,edit_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,can you process a refund for order #67890?,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,how do i update my payment information?,PAYMENT,pay_bill,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: can i pick up my order in store?,SHIPPING,change_shipping_address,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - what are my delivery options?,SHIPPING,delivery_period,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, where is my order?",ORDER,track_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - i see an unauthorized charge,PAYMENT,wrong_amount_charged,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: i'd like to stop my recurring payments,CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - can you process a refund for order #67890?,REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Quick question: i was charged twice, please refund me",REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: i'd like to stop my recurring payments,CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,my credit card was declined,PAYMENT,pay_bill,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: can i pay with paypal?,PAYMENT,wrong_amount_charged,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - my credit card was declined,PAYMENT,wrong_amount_charged,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: i was charged the wrong amount,PAYMENT,check_payment_methods,Thank you for contacting us. Let me assist you with that right away.
+BIC,i'd like to place a new order,ORDER,track_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: can i pause my subscription instead?,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,"Hello, i want to create a new account",ACCOUNT,delete_account,"I understand you'd like to delete your account. Please note that this action is permanent. To proceed, go to Settings > Account > Delete Account."
+BIC,i'm cancelling because the price is too high,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,i need to pay my bill,PAYMENT,pay_bill,Thank you for contacting us. Let me assist you with that right away.
+BIC,can you process a refund for order #67890?,REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, can i switch to a different account?",ACCOUNT,recover_password,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, how do i change my username?",ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: my refund is taking too long,REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: your agent was very helpful,FEEDBACK,complaint,I sincerely apologize for the inconvenience you've experienced. Your feedback is very important to us. Let me escalate this to our team immediately.
+BIC,Urgent: how long does shipping take?,SHIPPING,delivery_period,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: can i pause my subscription instead?,CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,"Hi, i want to report a problem",FEEDBACK,satisfaction_rating,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - i want a refund for my purchase,REFUND,get_refund,I'll be happy to help you with a refund. Refunds are typically processed within 3-5 business days. Could you please provide your order number?
+BIC,Quick question: what is your refund policy?,REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: how long does shipping take?,SHIPPING,track_shipment,"To track your shipment, please visit our tracking page and enter your tracking number. You can find it in your confirmation email."
+BIC,"Hi, i want to close my account permanently",ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,i'm having trouble registering,ACCOUNT,edit_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,i want to report a problem,FEEDBACK,complaint,I sincerely apologize for the inconvenience you've experienced. Your feedback is very important to us. Let me escalate this to our team immediately.
+BIC,I need help - i need to change my shipping address,SHIPPING,track_shipment,"To track your shipment, please visit our tracking page and enter your tracking number. You can find it in your confirmation email."
+BIC,"Hello, can i change my order?",ORDER,place_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, can i track my shipment?",SHIPPING,track_shipment,"To track your shipment, please visit our tracking page and enter your tracking number. You can find it in your confirmation email."
+BIC,i want to report a problem,FEEDBACK,review,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, please cancel my service immediately",CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,i forgot my password,ACCOUNT,create_account,I'd be happy to help you create a new account! Please visit our website and click 'Sign Up'. You'll need to provide your email address and create a password.
+BIC,Quick question: can i pay with paypal?,PAYMENT,wrong_amount_charged,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, where is my order?",ORDER,place_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - how long does shipping take?,SHIPPING,track_shipment,"To track your shipment, please visit our tracking page and enter your tracking number. You can find it in your confirmation email."
+BIC,I need help - i need to change my shipping address,SHIPPING,track_shipment,"To track your shipment, please visit our tracking page and enter your tracking number. You can find it in your confirmation email."
+BIC,"Hi, i forgot my password",ACCOUNT,registration_problems,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i need to pay my bill",PAYMENT,pay_bill,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, how long does shipping take?",SHIPPING,delivery_period,Thank you for contacting us. Let me assist you with that right away.
+BIC,"i was charged twice, please refund me",REFUND,get_refund,I'll be happy to help you with a refund. Refunds are typically processed within 3-5 business days. Could you please provide your order number?
+BIC,please cancel my service immediately,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,I need help - can you process a refund for order #67890?,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: what are my delivery options?,SHIPPING,delivery_period,Thank you for contacting us. Let me assist you with that right away.
+BIC,can i switch to a different account?,ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, how do i cancel my membership?",CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,how do i change my username?,ACCOUNT,edit_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, how long does shipping take?",SHIPPING,delivery_period,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i want a refund for my purchase",REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, how do i cancel my membership?",CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,Urgent: how do i change my username?,ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: i'm having trouble registering,ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: my order is missing an item,ORDER,track_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - i'm cancelling because the price is too high,CANCELLATION,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,I need help - i want to close my account permanently,ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: what is your refund policy?,REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: can i pay with paypal?,PAYMENT,pay_bill,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - i'd like to place a new order,ORDER,place_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i'm cancelling because the price is too high",CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: i'm cancelling because the price is too high,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,Urgent: when will i get my refund?,REFUND,refund_not_received,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i want to close my account permanently",ACCOUNT,create_account,I'd be happy to help you create a new account! Please visit our website and click 'Sign Up'. You'll need to provide your email address and create a password.
+BIC,Quick question: i forgot my password,ACCOUNT,registration_problems,Thank you for contacting us. Let me assist you with that right away.
+BIC,how do i delete my account?,ACCOUNT,edit_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: i have a complaint about my order,FEEDBACK,complaint,I sincerely apologize for the inconvenience you've experienced. Your feedback is very important to us. Let me escalate this to our team immediately.
+BIC,Urgent: i need to update my profile,ACCOUNT,edit_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, i'd like to place a new order",ORDER,track_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: i want to cancel my subscription,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,Quick question: where is my order?,ORDER,place_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: how do i update my payment information?,PAYMENT,payment_issue,I'm sorry you're experiencing payment issues. Could you please describe the error you're seeing? I'll do my best to help resolve this quickly.
+BIC,"Hi, my account was hacked",ACCOUNT,registration_problems,Thank you for contacting us. Let me assist you with that right away.
+BIC,i want to create a new account,ACCOUNT,delete_account,"I understand you'd like to delete your account. Please note that this action is permanent. To proceed, go to Settings > Account > Delete Account."
+BIC,can i modify the items in my order?,ORDER,place_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i forgot my password",ACCOUNT,edit_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,can i pay with paypal?,PAYMENT,wrong_amount_charged,Thank you for contacting us. Let me assist you with that right away.
+BIC,Urgent: how do i cancel my membership?,CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, i want to create a new account",ACCOUNT,switch_account,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: please cancel my service immediately,CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,can you process a refund for order #67890?,REFUND,check_refund_status,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hello, i'd like to place a new order",ORDER,place_order,Thank you for contacting us. Let me assist you with that right away.
+BIC,I need help - i want to cancel my subscription,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,Quick question: i need to cancel order #12345,ORDER,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,"Hi, i need to pay my bill",PAYMENT,check_payment_methods,Thank you for contacting us. Let me assist you with that right away.
+BIC,Quick question: can i change my order?,ORDER,cancel_order,I'm sorry to hear you'd like to cancel your order. Let me look that up for you. Could you please provide your order number?
+BIC,"Hi, i need to pay my bill",PAYMENT,payment_issue,I'm sorry you're experiencing payment issues. Could you please describe the error you're seeing? I'll do my best to help resolve this quickly.
+BIC,I need help - i'm cancelling because the price is too high,CANCELLATION,cancel_subscription,I understand you'd like to cancel your subscription. I'm sorry to see you go! Could you share the reason so we can improve?
+BIC,Quick question: i'd like to stop my recurring payments,CANCELLATION,change_reason,Thank you for contacting us. Let me assist you with that right away.
+BIC,"Hi, can i switch to a different account?",ACCOUNT,delete_account,"I understand you'd like to delete your account. Please note that this action is permanent. To proceed, go to Settings > Account > Delete Account."
+BIC,"Hi, can i change my order?",ORDER,order_not_arrived,Thank you for contacting us. Let me assist you with that right away.
