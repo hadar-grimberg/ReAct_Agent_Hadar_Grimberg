@@ -72,7 +72,10 @@ def classify_query(user_query: str) -> RouterDecision:
     """
     messages = [{"role": "user", "content": user_query}]
     response = chat(messages, system=ROUTER_SYSTEM, max_tokens=200, temperature=0.0)
-    response = response["content"]
+    if hasattr(response, "content"):
+        response = response.content
+    elif isinstance(response, dict):
+        response = response.get("content", "")
 
     # Parse structured response
     type_match = re.search(r"TYPE:\s*(STRUCTURED|UNSTRUCTURED|OUT_OF_SCOPE)", response, re.I)

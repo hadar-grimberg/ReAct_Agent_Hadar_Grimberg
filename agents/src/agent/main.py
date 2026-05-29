@@ -74,13 +74,22 @@ Commands:  help | quit | exit
 """
 
 
-def print_trace(trace: list[str]) -> None:
-    print()
-    print(dim("─" * 60))
-    print(bold(cyan("  Reasoning trace:")))
-    for step in trace:
-        print(dim("  " + step))
-    print(dim("─" * 60))
+def print_trace(trace_list):
+    # Ensure trace_list exists and is iterable
+    if not trace_list:
+        return
+
+    for step in trace_list:
+        # If the step is a LangChain message object, extract its content text
+        if hasattr(step, "content"):
+            step_text = f"[{step.type.upper()}]: {step.content}"
+        elif isinstance(step, dict):
+            step_text = step.get("content", str(step))
+        else:
+            step_text = str(step)
+
+        # Line 82: Now we pass a guaranteed string to your dim formatter
+        print(dim("  " + step_text))
 
 
 def print_answer(answer: str) -> None:
@@ -151,8 +160,8 @@ def run_single_query(dataset_path: str, query: str) -> None:
 
     load_dataset(dataset_path)
     state = run_graph(query)
-    print_trace(state.trace)
-    print_answer(state.final_answer)
+    print_trace(state["trace"])
+    print_answer(state["final_answer"])
 
 
 def main() -> None:

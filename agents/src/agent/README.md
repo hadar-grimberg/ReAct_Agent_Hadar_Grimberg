@@ -178,43 +178,19 @@ agent/
 
 ### Model Choice
 
-1. Model for Routing (Intent Classification):
-meta-llama/Meta-Llama-3.1-8B-Instruct 
+Choosing meta-llama/Llama-3.3-70B-Instruct for a production-grade ReAct (Reason-Action-Observation) agent tracking customer-support data is an exceptionally wise choice.
+While smaller models (8B to 14B parameters) often struggle with multi-turn coherence, and proprietary closed-source models incur massive pricing overheads, Llama-3.3-70B hits the absolute sweet spot for complex agentic pipelines.
 
-I chose this model because it has low latency and high throughput. 
-Routing sits at the beginning of the pipeline. Any latency incurred here delays the rest of the agent's execution loop. 
-An 8B parameter model features exceptionally fast time-to-first-token (TTFT) and high token generation speeds.
-
-ReAct routing requires the model to classify an input into one of three distinct categories (Structured, Unstructured, 
-or Out-of-scope). Llama-3.1-8B heavily supports strict tool calling and JSON formatting schema enforcement.
-
-Moreover, because routing evaluates every single incoming query, utilizing a massive model would inflate API costs 
-needlessly. Llama-3.1-8B is maximizing the cost efficiency.
-
-In addition, classifying whether a text is a concrete dataset question vs. an open-ended question vs. an unrelated 
-general question, is a highly specialized but straightforward semantic classification task. 
-An 8B instruction-tuned model easily masters this with simple few-shot prompting.
-
-2. Model for Generation & ReAct Step Processing: 
-meta-llama/Llama-3.3-70B-Instruct 
-
-Once the router delegates a query to the execution graph, the generation model must act as the "brain" of the ReAct framework.
-Structured queries requires advanced reasoning, the model needs to intelligently write exact SQL or formulate 
-deterministic tool arguments, evaluate the tool payload returned by the LangGraph state, and loop through a 
-Thought-Action-Observation cycle. The 70B+ parameter tier has a significantly stronger mathematical, code-generation, 
-and multi-step reasoning foundation compared to lightweight models.
-
-For open-ended tasks, the generation model needs to ingest large chunks of retrieved context data and synthesize it into
-a clean, cohesive, and professional response without losing crucial details or hallucinating.
-
-Expansive context windows (128K tokens) is crucial for handling large dataset text dumps or comprehensive tool results 
-passed back into the graph state.
-For queries flagged or routed as out-of-scope, larger models excel at maintaining a system-guided persona—politely but 
-firmly deflecting inquiries outside the dataset constraints rather than leaking or ignoring instructions.
-
-Summary Strategy:
-Entry Node: Receives the query $\rightarrow$ Invokes Meta-Llama-3.1-8B-Instruct $\rightarrow$ Fast evaluation determines 
-the conditional routing path.
-
-The Execution/Action Loop: If Structured or Unstructured $\rightarrow$ Handoff to Llama-3.3-70B-Instruct to generate 
-tool calls (ReAct loop), observe results, and compose the ultimate user-facing response.
+1. World-Class Native Function Calling (Action Accuracy):
+  A ReAct agent's biggest vulnerability is structural failure—either hallucinating tool arguments or messing up JSON payloads.Llama 3.3-70B was trained with an explicit focus on zero-shot tool use and function orchestration.
+  It excels at parsing native Pydantic descriptions and reliably maps parameter arguments ("n": "3", "category": "SHIPPING", "intent": "") perfectly to your tool schemas without dropping brackets or triggering JSON decode failures.
+2. Advanced Metacognition & Self-Correction (The "Reason" Step):
+   When a tool returns an error—like filter_and_sample → error: No rows match the given filters. -> smaller open models lack the reasoning depth to diagnose why. 
+   They often panic and enter an infinite loop repeating the exact same bad call. 
+   Llama-3.3-70B possesses the logical depth necessary to step back and re-evaluate its beliefs.
+   It looks at its previous mistake, checks its system memory, deduces that it confused a category string with an intent string, and immediately pivots to an inspection utility (list_intents or list_categories) to correct its direction autonomously.
+3. Immense Context Window (128K Tokens):
+   ReAct architectures are token-heavy. Every single iteration appends system prompts, available tool schemas, raw tool execution payloads (which can contain rows of text examples), and past agent thoughts into the chat history.
+   With a 128K context window, Llama-3.3-70B can maintain a massive data audit trail effortlessly over long-running multi-step chains (10+ iterations) without forgetting the initial user query or truncating vital early tool observations.
+4. Unmatched Price-to-Performance RatioRunning state-of-the-art closed-source models (like GPT-4o or Claude 3.5 Sonnet) over a loop that executes up to 12 iterations per user query will balloon your API bill rapidly.
+    Hosted on infrastructure like Nebius, Llama-3.3-70B delivers near-frontier reasoning metrics at a tiny fraction of the cost.This allows your enterprise to scale data parsing and qualitative summaries over thousands of data operations sustainably.

@@ -1,26 +1,15 @@
-"""
-agent.py — LangGraph ReAct agent for the Bitext dataset.
-
-Graph structure:
-  [START] → router_node → {out_of_scope? → END}
-                        → {structured/unstructured} → agent_node → tool_node → agent_node → ... → END
-
-The agent follows the ReAct (Reason + Act) loop:
-  1. THINK: decide which tool to call (or conclude with a final answer)
-  2. ACT:   call the tool
-  3. OBSERVE: incorporate the tool result
-  4. Repeat until final answer or max_iterations reached
-"""
 from __future__ import annotations
 
 import json
-import re
-from dataclasses import dataclass, field
-from typing import Literal, TypedDict, Annotated, Optional
+from typing import Literal, TypedDict, Annotated, Optional, Sequence, Dict, List, Any
 from langgraph.graph import StateGraph, START, END
+from langchain_core.messages import BaseMessage, ToolMessage, AIMessage, HumanMessage, SystemMessage
+from langgraph.graph.message import add_messages
 from llm import chat
 from router import classify_query, QueryType, RouterDecision
-from tools import TOOL_REGISTRY, call_tool
+from tools import LANGGRAPH_TOOLS, call_tool
+from langchain_core.utils.function_calling import convert_to_openai_tool
+
 
 # ---------------------------------------------------------------------------
 # Configuration
@@ -36,8 +25,8 @@ class AgentState(TypedDict):
     """LangGraph State representation tracking agent context across nodes."""
     user_query: str
     router_decision: Optional[RouterDecision]
-    messages: list[dict]
-    trace: list[str]
+    messages: Annotated[Sequence[BaseMessage], add_messages]
+    trace: Annotated[List[str], add_messages]
     final_answer: str
     iteration: int
     pending_tool_name: Optional[str]
@@ -50,123 +39,103 @@ class AgentState(TypedDict):
 
 
 AGENT_SYSTEM_STRUCTURED = """\
-You are a data assistant running in a ReAct loop, that answers questions about the Bitext customer-support dataset. 
-You must choose a tool or provide a final answer using your native tool-calling capabilities.
+You are an expert data analysis assistant operating in a ReAct (Reason-Action-Observation) framework.
+Your purpose is to provide precise, data-driven answers about the customer support dataset using your available tools.
 
-CRITICAL RULE:
-- you MUST call a tool immediately. 
+DATASET SCHEMA — CRITICAL DISTINCTIONS:
+  • category    — Broad operational domain. Always ALL-CAPS. Examples: ACCOUNT, SHIPPING, REFUND,
+                  ORDER, PAYMENT, FEEDBACK, CANCELLATION_REQUEST. This is the TOP-LEVEL grouping.
+  • intent      — Granular user action within a category. Always lowercase_snake_case.
+                  Examples: track_order, get_refund, cancel_order, change_shipping_address.
+  • instruction — The raw customer message text.
+  • response    — The agent's reply text.
 
-The dataset has these columns:
-  • category  — top-level topic (e.g. ACCOUNT, ORDER, REFUND, SHIPPING, PAYMENT, FEEDBACK, CANCELLATION)
-  • intent    — specific user intent within a category (e.g. get_refund, cancel_order, track_order)
-  • instruction — the customer's original message
-  • response  — the customer service agent's reply
+⚠️  PARAMETER ROUTING RULES — READ BEFORE EVERY TOOL CALL:
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │  User says "SHIPPING examples"   → category="SHIPPING",  intent=""         │
+  │  User says "track_order examples"→ category="",          intent="track_order"│
+  │  User says "ACCOUNT intents"     → list_intents(category="ACCOUNT")        │
+  │  "SHIPPING" is ALWAYS a category. It is NEVER an intent.                   │
+  │  "get_refund" is ALWAYS an intent. It is NEVER a category.                 │
+  └─────────────────────────────────────────────────────────────────────────────┘
+  Before calling filter_and_sample or count_rows, ask yourself:
+    - Is the value ALL-CAPS (like SHIPPING, ACCOUNT, REFUND)? → put it in `category`
+    - Is the value lowercase_snake_case (like track_order)?   → put it in `intent`
 
-You must answer using the provided tools. Do NOT answer from general knowledge.
-
-Available tools:
+AVAILABLE TOOLS:
 {tools_description}
 
-Rules for Function/Tool Calling:
-- To call an action or look up data, invoke the matching native tool provided in your tool definitions.
-- Always start by listing categories or intents if you are unsure of valid filter values.
-- Chain tool calls sequentially as needed (e.g. list_intents → count_rows → filter_and_sample).
-- If a tool returns an error, examine the payload, try a corrected call, or explain what went wrong.
+REACT BEHAVIOR RULES:
+1. Pre-Tool Reasoning: Before every tool call, explicitly decide: is this value a
+   category (ALL-CAPS domain) or an intent (lowercase action)? Write your reasoning.
+2. Multi-Step Chaining: For compound queries, chain tools sequentially. E.g., to
+   answer "distribution in SHIPPING", call intent_distribution(category="SHIPPING").
+3. Schema Self-Correction: If a tool returns "No rows match", you likely put a
+   category value into the intent field or vice-versa. Swap it and retry ONCE.
+   Do NOT call list_intents just to pick a random intent — re-examine your parameters.
+4. Anti-Hallucination: Rely strictly on tool results. Never fabricate counts or examples.
 
-When you have gathered enough information from your tool observations to give a complete, accurate answer, stop calling tools and respond with:
-FINAL ANSWER: <your answer here>
+OUTPUT PROTOCOL:
+When analysis is complete, reply in this exact format:
+FINAL ANSWER: <Your thorough, factually validated response here>
 """
-# For Example:
-# [{'role': 'user', 'content': 'How many refund requests did we get?'},
-#  {'role': 'assistant',
-#   'content': 'We need count of rows where category = REFUND? Actually "refund requests" maybe intent get_refund. Let\'s see intents.
-#   ' ```tool_call
-# {{
-#   "tool": "list_intents",
-#   "params": {{"category": "REFUND"}}
-# }}
-
 
 AGENT_SYSTEM_UNSTRUCTURED = """\
 You are a qualitative analyst agent that interprets and summarises the Bitext
-customer-support dataset. You must base your narrative summaries on actual data
-retrieved via tools — do NOT fabricate examples or statistics.
+customer-support dataset. Base ALL narrative summaries on actual tool-retrieved
+data — never fabricate examples, counts, or statistics.
 
-The dataset has columns: category, intent, instruction (customer message), response (agent reply).
+DATASET SCHEMA:
+  • category    — Broad ALL-CAPS domain: ACCOUNT, SHIPPING, REFUND, ORDER,
+                  PAYMENT, FEEDBACK, CANCELLATION_REQUEST, etc.
+  • intent      — Specific lowercase_snake_case action: track_order, get_refund,
+                  complaint, cancel_order, change_shipping_address, etc.
+  • instruction — Customer's raw message text.
+  • response    — Agent's reply text.
 
-Available tools:
+⚠️  CRITICAL TOOL SELECTION — decide this before every tool call:
+  ┌────────────────────────────────────────────────────────────────────────────┐
+  │ User mentions a CATEGORY (an ALL-CAPS domain like FEEDBACK, SHIPPING):    │
+  │   → summarize_category(category="FEEDBACK")                               │
+  │                                                                            │
+  │ User mentions an INTENT CONCEPT (a type of action like "complaint",       │
+  │   "refund", "cancel", "track") — even phrased as "complaint intents",    │
+  │   "cancellation requests", "refund-related queries":                      │
+  │   → summarize_by_intent(intent_keyword="complaint")                       │
+  │   → NEVER call summarize_category for intent-concept queries              │
+  │   → NEVER invent a category name like "COMPLAINT" — it does not exist    │
+  └────────────────────────────────────────────────────────────────────────────┘
+
+AVAILABLE TOOLS:
 {tools_description}
 
-To call a tool:
-```tool_call
-{{
-  "tool": "<tool_name>",
-  "params": {{<key>: <value>, ...}}
-}}
-```
+RULES:
+1. Decide FIRST: category name → summarize_category | intent concept → summarize_by_intent
+2. Optionally chain intent_distribution for quantitative support.
+3. Write a structured, human-readable narrative — not a raw data dump.
+4. Every factual claim must be grounded in actual tool results.
 
-When ready to deliver a final narrative answer:
-FINAL ANSWER: <your well-structured summary here>
-
-Rules:
-- Use summarize_category to gather representative examples for any narrative answer.
-- You may also call intent_distribution or filter_and_sample for supporting statistics.
-- Write a clear, human-readable summary — not a data dump.
-- Ground every claim in actual tool results.
-
-
-
+When ready to answer, respond with:
+FINAL ANSWER: <your well-structured narrative here>
 """
 
 
-def _get_native_tool_schemas() -> list[dict]:
+# ---------------------------------------------------------------------------
+# Helper Schema Utilities
+# ---------------------------------------------------------------------------
+
+def _get_native_tool_schemas() -> List[Dict[str, Any]]:
+    """Converts native LangGraph Pydantic tools into compliant tool schemas.
     """
-    Dynamically maps your project's local TOOL_REGISTRY definitions
-    into strict, valid OpenAI/Nebius function-calling schemas.
-    """
-    native_schemas = []
-
-    for name, entry in TOOL_REGISTRY.items():
-        # 1. Initialize properties mapping
-        properties_dict = {}
-        required_list = []
-
-        # 2. Safely parse internal parameters map
-        if "params" in entry and entry["params"]:
-            for p_name, p_desc in entry["params"].items():
-                properties_dict[p_name] = {
-                    "type": "string",  # Enforce string types for categorical lookups
-                    "description": p_desc
-                }
-                # Optional: If you want to make all parameters optional by default,
-                # keep required_list empty unless specified otherwise.
-
-        # 3. Assemble the compliant layout structure
-        schema_wrapper = {
-            "type": "function",
-            "function": {
-                "name": name,
-                "description": entry.get("description", f"Execute {name}"),
-                "parameters": {
-                    "type": "object",
-                    "properties": properties_dict,
-                    "required": required_list
-                }
-            }
-        }
-        native_schemas.append(schema_wrapper)
-
-    return native_schemas
+    return [convert_to_openai_tool(t) for t in LANGGRAPH_TOOLS]
 
 
 def _build_tools_description() -> str:
-    lines = []
-    for name, entry in TOOL_REGISTRY.items():
-        lines.append(f"• {name}: {entry['description']}")
-        if entry["params"]:
-            for param, desc in entry["params"].items():
-                lines.append(f"    - {param}: {desc}")
-    return "\n".join(lines)
+    """Assembles a highly readable text schema summary block for system prompts."""
+    desc = []
+    for t in LANGGRAPH_TOOLS:
+        desc.append(f"  • tool: {t.name}\n    description: {t.description}")
+    return "\n".join(desc)
 
 
 # ---------------------------------------------------------------------------
@@ -176,14 +145,13 @@ def _build_tools_description() -> str:
 def router_node(state: AgentState) -> dict:
     """Classifies incoming query intent and handles early out-of-scope routing."""
     query = state["user_query"]
-    trace = list(state.get("trace", []))
+    trace = ["🔀 [ROUTER] Classifying query..."]
 
-    trace.append("🔀 [ROUTER] Classifying query...")
     decision = classify_query(query)
 
-    trace.append(
+    trace.append(AIMessage(
         f"🔀 [ROUTER] Type={decision.query_type.value.upper()}  "
-        f"Confidence={decision.confidence}  |  {decision.reasoning}"
+        f"Confidence={decision.confidence}  |  {decision.reasoning}")
     )
 
     final_answer = ""
@@ -197,76 +165,89 @@ def router_node(state: AgentState) -> dict:
     return {
         "router_decision": decision,
         "trace": trace,
-        "final_answer": final_answer,
-        "messages": [{"role": "user", "content": query}]
+        "messages": list(state.get("messages", [])),
+        "final_answer": final_answer
     }
 
 
 def agent_node(state: AgentState) -> dict:
     """Executes the THINK step of the ReAct sequence via LLM chat payload generation."""
     current_iteration = state.get("iteration", 0) + 1
-    trace = list(state.get("trace", []))
+    trace = []
     messages = list(state.get("messages", []))
     decision = state["router_decision"]
 
     # ── Max Iteration Breaker ──
-    if current_iteration > 12:
-        trace.append(f"⚠️  [AGENT] Max iterations (12) reached. Returning partial data.")
-        last_obs = next((m["content"] for m in reversed(messages) if "OBSERVATION:" in m["content"]), "No data gathered.")
+    if current_iteration > MAX_ITERATIONS:
+        trace.append(SystemMessage("⚠️  [AGENT] Max iterations ({MAX_ITERATIONS}) reached. Returning partial data."))
+        # Safely parse content attributes from real message structures
+        last_obs = next((m.content for m in reversed(messages) if isinstance(m, ToolMessage)), "No data gathered.")
         return {
             "iteration": current_iteration,
             "trace": trace,
             "final_answer": f"Execution ceiling hit. Partial details gathered:\n\n{last_obs}"
         }
 
-    trace.append(f"🤔 [AGENT] Iteration {current_iteration} — thinking...")
+    trace.append(AIMessage(f"🤔 [AGENT] Iteration {current_iteration} — thinking..."))
 
     # Assemble context layout
     qtype = decision.query_type if decision else QueryType.STRUCTURED
     system_template = AGENT_SYSTEM_STRUCTURED if qtype == QueryType.STRUCTURED else AGENT_SYSTEM_UNSTRUCTURED
     system_prompt = system_template.format(tools_description=_build_tools_description())
 
-    native_tools=_get_native_tool_schemas()
-    # Generate inference message history (excluding system prompt from dynamic list mutations)
+    native_tools = _get_native_tool_schemas()
+
+    # Generate inference message history (CLEANED: Only calling chat() once)
     response = chat(messages, system=system_prompt, max_tokens=1024, temperature=0.0, tools=native_tools)
-    messages.append({"role": "assistant", "content": response['reasoning_content']})
+
+    # --- LOOP BREAKER SAFEGUARD: Compute look-back status BEFORE modifying message list ---
+    was_last_msg_tool = len(messages) > 0 and isinstance(messages[-1], ToolMessage)
+
+    messages.append(response)
 
     # Initialize updates
     updates = {
         "iteration": current_iteration,
         "trace": trace,
-        "messages": messages,
+        "messages": [response],
         "pending_tool_name": None,
         "pending_tool_params": None,
         "final_answer": ""
     }
 
-    # ── Parsing Model Decisions ──
-    if "FINAL ANSWER:" in response:
-        updates["final_answer"] = response.split("FINAL ANSWER:", 1)[1].strip()
-        trace.append("✅ [AGENT] Final answer produced.")
+    # ── Explicit Parsing Match ──
+    if "FINAL ANSWER:" in response.content:
+        updates["final_answer"] = response.content.split("FINAL ANSWER:", 1)[1].strip()
+        trace.append(AIMessage("✅ [AGENT] Final answer produced."))
         return updates
 
-    tool_match = response.get("tool_calls")
+    tool_match = response.tool_calls
+
+    if not tool_match and was_last_msg_tool:
+        clean_content = response.content.strip()
+        if clean_content:
+            updates["final_answer"] = clean_content
+            trace.append(AIMessage("✅ [AGENT] Final answer produced automatically from tool observation data context."))
+            return updates
 
     if tool_match:
         try:
-            updates["pending_tool_name"] = tool_match[0]["function"]["name"]
-            updates["pending_tool_params"] = json.loads(tool_match[0]["function"]["arguments"])
-            trace.append(f"🔧 [AGENT] Calling tool: {updates['pending_tool_name']} params={json.dumps(updates['pending_tool_params'])}")
-        except json.JSONDecodeError as e:
-            trace.append(f"⚠️  [AGENT] Malformed tool_call JSON: {e}")
-            messages.append({
-                "role": "user",
-                "content": f"OBSERVATION: Error parsing JSON markdown block: {e}. Re-verify syntactic schemas and retry."
-            })
+            updates["pending_tool_name"] = tool_match[0]["name"]
+            tool_params = tool_match[0]["args"] or {}
+
+            updates["pending_tool_params"] = tool_params
+            trace.append(AIMessage(f"🔧 [AGENT] Calling tool: {updates['pending_tool_name']} params={json.dumps(updates['pending_tool_params'])}"))
+        except Exception as e:
+            trace.append(AIMessage(f"⚠️  [AGENT] Parameter parse exception triggered: {e}"))
+            messages.append(SystemMessage(
+                content=f"OBSERVATION: Runtime argument exception parsing parameters: {e}. Please correct tool schemas."
+            ))
             updates["messages"] = messages
     else:
-        trace.append("⚠️  [AGENT] No tool_call or FINAL ANSWER found — prompting retry.")
-        messages.append({
-            "role": "user",
-            "content": "OBSERVATION: Output structural requirements were missed. Ensure tool calls use standard triple backtick formats."
-        })
+        trace.append(AIMessage("⚠️  [AGENT] No tool_call or FINAL ANSWER found — prompting retry."))
+        messages.append(SystemMessage(
+            content="OBSERVATION: Output structural requirements were missed. Ensure tool calls use standard formats."
+        ))
         updates["messages"] = messages
 
     return updates
@@ -276,31 +257,42 @@ def tool_node(state: AgentState) -> dict:
     """Executes the specific structured action tool registered inside the execution loop."""
     tool_name = state.get("pending_tool_name")
     tool_params = state.get("pending_tool_params") or {}
-    trace = list(state.get("trace", []))
+    trace = []
     messages = list(state.get("messages", []))
 
     if not tool_name:
         return {}
 
+    # 1. Inspect recent runtime historical items to bind accurate tool transaction IDs
+    last_ai_message = messages[-1] if messages else None
+    tool_call_id = "default_id"
+    if last_ai_message and hasattr(last_ai_message, "tool_calls") and last_ai_message.tool_calls:
+        tool_call_id = last_ai_message.tool_calls[0]["id"]
+
+    # 2. Dispatch dynamic utility execution pipeline
     raw_result = call_tool(tool_name, tool_params)
     result_dict = json.loads(raw_result)
 
     if result_dict.get("success", False):
-        obs = f"OBSERVATION: Tool '{tool_name}' succeeded.\nResult:\n{json.dumps(result_dict['data'], indent=2)}"
-        trace.append(f"📊 [TOOL]  {tool_name} → success")
+        obs_content = json.dumps(result_dict['data'], indent=2)
+        trace.append(AIMessage(f"📊 [TOOL]  {tool_name} → success"))
     else:
-        obs = f"OBSERVATION: Tool '{tool_name}' failed. Error: {result_dict.get('error')}"
-        trace.append(f"❌ [TOOL]  {tool_name} → error: {result_dict.get('error')}")
+        obs_content = f"Error: {result_dict.get('error')}"
+        trace.append(AIMessage(f"❌ [TOOL]  {tool_name} → error: {result_dict.get('error')}"))
 
-    messages.append({"role": "user", "content": obs})
+    # 3. Instantiate strict ToolMessage objects tracking back to our context call index
+    tool_message = ToolMessage(
+        content=obs_content,
+        name=tool_name,
+        tool_call_id=tool_call_id
+    )
 
     return {
         "trace": trace,
-        "messages": messages,
+        "messages": [tool_message],
         "pending_tool_name": None,
         "pending_tool_params": None
     }
-
 
 # ---------------------------------------------------------------------------
 # Conditional Routing Edges
@@ -314,11 +306,11 @@ def route_after_classification(state: AgentState) -> Literal["agent_node", "__en
     return "agent_node"
 
 
-def route_after_agent(state: AgentState) -> Literal["tool_node", "__end__"]:
+def route_after_agent(state: AgentState) -> Literal["tool_node", "agent_node", "__end__"]:
     """Evaluates agent thinking states to break out or activate execution nodes."""
     if state.get("final_answer"):
         return "__end__"
-    if state.get("iteration", 0) >= 12:
+    if state.get("iteration", 0) >= MAX_ITERATIONS:
         return "__end__"
     if state.get("pending_tool_name"):
         return "tool_node"
@@ -365,14 +357,14 @@ react_agent = builder.compile()
 # ---------------------------------------------------------------------------
 
 def run_graph(query: str) -> dict:
-    """
-    Executes the structured LangGraph engine.
+    """Executes the structured LangGraph engine.
+
     Returns dictionary with populated system context keys.
     """
     initial_state: AgentState = {
         "user_query": query,
         "router_decision": None,
-        "messages": [],
+        "messages": [HumanMessage(content=query)],
         "trace": [],
         "final_answer": "",
         "iteration": 0,
