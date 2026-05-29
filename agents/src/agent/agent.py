@@ -6,6 +6,7 @@ from langgraph.graph import StateGraph, START, END
 from langchain_core.messages import BaseMessage, ToolMessage, AIMessage, HumanMessage, SystemMessage
 from langgraph.graph.message import add_messages
 from llm import chat
+from langgraph.checkpoint.memory import MemorySaver
 from router import classify_query, QueryType, RouterDecision
 from tools import LANGGRAPH_TOOLS, call_tool
 from langchain_core.utils.function_calling import convert_to_openai_tool
@@ -348,19 +349,21 @@ builder.add_conditional_edges(
 
 builder.add_edge("tool_node", "agent_node")
 
+# Instantiate memory saver persistence checkpointer
+memory_checkpointer = MemorySaver()
+
 # Compile Execution State
-react_agent = builder.compile()
+react_agent = builder.compile(checkpointer=memory_checkpointer)
 
 
 # ---------------------------------------------------------------------------
 # Invocation Entry Point
 # ---------------------------------------------------------------------------
 
-def run_graph(query: str) -> dict:
-    """Executes the structured LangGraph engine.
+def run_graph(query: str, session_id: str = "default_session") -> dict:
+    """Executes the structured LangGraph engine with thread-bound persistence."""
 
-    Returns dictionary with populated system context keys.
-    """
+    config = {"configurable": {"thread_id": session_id}}
     initial_state: AgentState = {
         "user_query": query,
         "router_decision": None,
@@ -372,4 +375,4 @@ def run_graph(query: str) -> dict:
         "pending_tool_params": None
     }
 
-    return react_agent.invoke(initial_state)
+    return react_agent.invoke(initial_state, config=config)
