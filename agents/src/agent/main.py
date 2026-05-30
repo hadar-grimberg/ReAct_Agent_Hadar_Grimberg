@@ -100,7 +100,7 @@ def print_answer(answer: str) -> None:
     print()
 
 
-def run_interactive(dataset_path: str) -> None:
+def run_interactive(dataset_path: str, session:str) -> None:
     # ── Import here so errors surface clearly ───────────────────────────────
     from tools import load_dataset
     from agent import run_graph
@@ -140,7 +140,7 @@ def run_interactive(dataset_path: str) -> None:
         print(dim(f"\n  [Processing …]"))
 
         try:
-            state = run_graph(query)
+            state = run_graph(query, session_id=session)
         except Exception as e:
             print(red(f"\n  ✗ Agent error: {e}"))
             import traceback
@@ -154,12 +154,12 @@ def run_interactive(dataset_path: str) -> None:
         print_answer(state.get("final_answer", ""))
 
 
-def run_single_query(dataset_path: str, query: str) -> None:
+def run_single_query(dataset_path: str, query: str, session_id: str) -> None:
     from tools import load_dataset
     from agent import run_graph
 
     load_dataset(dataset_path)
-    state = run_graph(query)
+    state = run_graph(query, session_id=session_id)
     print_trace(state["trace"])
     print_answer(state["final_answer"])
 
@@ -185,6 +185,13 @@ def main() -> None:
         action="store_true",
         help="Disable ANSI colour output",
     )
+
+    parser.add_argument(
+        "--session",
+        default="default_session",
+        help="Unique session ID thread token to persist/restore conversation state across turns",
+    )
+
     args = parser.parse_args()
 
     if args.no_colour:
@@ -198,9 +205,9 @@ def main() -> None:
         sys.exit(1)
 
     if args.query:
-        run_single_query(args.dataset, args.query)
+        run_single_query(args.dataset, args.query, args.session)
     else:
-        run_interactive(args.dataset)
+        run_interactive(args.dataset, args.session)
 
 
 if __name__ == "__main__":
