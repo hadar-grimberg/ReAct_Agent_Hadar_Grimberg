@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+import pickle
 import json
 from typing import Literal, TypedDict, Annotated, Optional, Sequence, Dict, List, Any
 from langgraph.graph import StateGraph, START, END
@@ -10,6 +12,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from router import classify_query, QueryType, RouterDecision
 from tools import LANGGRAPH_TOOLS, call_tool
 from langchain_core.utils.function_calling import convert_to_openai_tool
+
 
 
 # ---------------------------------------------------------------------------
@@ -32,6 +35,49 @@ class AgentState(TypedDict):
     iteration: int
     pending_tool_name: Optional[str]
     pending_tool_params: Optional[dict]
+    session_id: str
+
+
+# ---------------------------------------------------------------------------
+# Dynamic Profile File Handling Utilities
+# ---------------------------------------------------------------------------
+
+
+def load_user_profile(session_id: str) -> dict:
+    """Reads a persistent user profile from disk. If missing, returns template defaults."""
+    path = "profiles.json"
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                profiles = json.load(f)
+                if session_id in profiles:
+                    return profiles[session_id]
+        except Exception:
+            pass
+    return {
+        "user_name": session_id,
+        "frequent_topics_or_intents": [],
+        "user_preferences_and_constraints": [],
+        "observed_facts": []
+    }
+
+
+def save_user_profile(session_id: str, profile_data: dict) -> None:
+    """Saves a user profile payload securely back to disk."""
+    path = "profiles.json"
+    if not os.path.exists(path):
+        profiles = {}
+        profiles[session_id] = profile_data
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(profiles, f, indent=2, ensure_ascii=False)
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            profiles = json.load(f)
+            profiles[session_id] = profile_data
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(profiles, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        print(f"⚠️ Warning: Failed to write persistent user profile profile: {e}")
 
 
 # ---------------------------------------------------------------------------
@@ -62,6 +108,13 @@ DATASET SCHEMA — CRITICAL DISTINCTIONS:
   Before calling filter_and_sample or count_rows, ask yourself:
     - Is the value ALL-CAPS (like SHIPPING, ACCOUNT, REFUND)? → put it in `category`
     - Is the value lowercase_snake_case (like track_order)?   → put it in `intent`
+    
+WHAT YOU REMEMBER ABOUT THIS USER (PROFILE LAYER)
+  User Name: {user_profile_context[user_name]}
+  Frequently Asked Topics: {user_profile_context[frequent_topics_or_intents]}
+  Preferences and Constraints: {user_profile_context[user_preferences_and_constraints]}
+  Observed Facts: {user_profile_context[observed_facts]}
+
 
 AVAILABLE TOOLS:
 {tools_description}
@@ -75,10 +128,11 @@ REACT BEHAVIOR RULES:
    category value into the intent field or vice-versa. Swap it and retry ONCE.
    Do NOT call list_intents just to pick a random intent — re-examine your parameters.
 4. Anti-Hallucination: Rely strictly on tool results. Never fabricate counts or examples.
+5. Write a structured, human-readable narrative — not a raw data dump.
 
 OUTPUT PROTOCOL:
 When analysis is complete, reply in this exact format:
-FINAL ANSWER: <Your thorough, factually validated response here>
+FINAL ANSWER: <Your thorough, factually validated narrative here>
 """
 
 AGENT_SYSTEM_UNSTRUCTURED = """\
@@ -107,6 +161,12 @@ DATASET SCHEMA:
   │   → NEVER invent a category name like "COMPLAINT" — it does not exist    │
   └────────────────────────────────────────────────────────────────────────────┘
 
+WHAT YOU REMEMBER ABOUT THIS USER (PROFILE LAYER)
+  User Name: {user_profile_context[user_name]}
+  Frequently Asked Topics: {user_profile_context[frequent_topics_or_intents]}
+  Preferences and Constraints: {user_profile_context[user_preferences_and_constraints]}
+  Observed Facts: {user_profile_context[observed_facts]}
+
 AVAILABLE TOOLS:
 {tools_description}
 
@@ -117,7 +177,7 @@ RULES:
 4. Every factual claim must be grounded in actual tool results.
 
 When ready to answer, respond with:
-FINAL ANSWER: <your well-structured narrative here>
+FINAL ANSWER: <your narrative here>
 """
 
 
@@ -177,6 +237,7 @@ def agent_node(state: AgentState) -> dict:
     trace = []
     messages = list(state.get("messages", []))
     decision = state["router_decision"]
+    session_id = state.get("session_id", "default_session")
 
     # ── Max Iteration Breaker ──
     if current_iteration > MAX_ITERATIONS:
@@ -191,10 +252,15 @@ def agent_node(state: AgentState) -> dict:
 
     trace.append(AIMessage(f"🤔 [AGENT] Iteration {current_iteration} — thinking..."))
 
+    # Fetch and stringify user profile attributes dynamically
+    profile = load_user_profile(session_id)
+    # profile_str = json.dumps(profile, indent=2, ensure_ascii=False)
+
+
     # Assemble context layout
     qtype = decision.query_type if decision else QueryType.STRUCTURED
     system_template = AGENT_SYSTEM_STRUCTURED if qtype == QueryType.STRUCTURED else AGENT_SYSTEM_UNSTRUCTURED
-    system_prompt = system_template.format(tools_description=_build_tools_description())
+    system_prompt = system_template.format(tools_description=_build_tools_description(), user_profile_context=profile)
 
     native_tools = _get_native_tool_schemas()
 
@@ -295,6 +361,58 @@ def tool_node(state: AgentState) -> dict:
         "pending_tool_params": None
     }
 
+
+def profile_updater_node(state: AgentState) -> dict:
+    """Analyses the latest conversation turn to dynamically condense, expand, and update the profile json database."""
+    session_id = state.get("session_id", "default_session")
+    query = state["user_query"]
+    answer = state.get("final_answer", "")
+    trace = []
+
+    current_profile = load_user_profile(session_id)
+
+    trace.append(AIMessage("👤 [PROFILE SUMMARY] Auditing context for updates..."))
+
+    profile_sys_prompt = """\
+        You are an advanced data extraction utility that creates concise, distilled user summaries.
+        Review the current user profile state, the new incoming question, and the generated answer. Your job is to output an updated profile mapping object tracking explicit facts revealed about the user (e.g. their name, specific interests, or explicit preferences).
+        CRITICAL RULES:
+        1. Do not repeat facts already tracked in the profile.
+        2. If new topics are explored (like asking about 'REFUND' or 'SHIPPING'), add them cleanly to the 'frequent_topics_or_intents' array.
+        3. If the user mentions their name (e.g., "I'm David", "My name is Alice"), extract and save it under 'user_name'.
+        Return output strictly as a valid minified JSON object matching the current profile format, without any Markdown wrappers or backticks.
+        """
+
+    payload = f"Current Profile:\n{json.dumps(current_profile)}\n\nTurn Info:\nUser Question: {query}\nAgent Answer: {answer}"
+
+    try:
+        # Use single chat lookup to produce updated JSON
+        updater_response = chat(
+            messages=[HumanMessage(content=payload)],
+            system=profile_sys_prompt,
+            max_tokens=512,
+            temperature=0.0
+        )
+
+        # Clean text markup wrappers if the model generated any backticks
+        clean_json_str = updater_response.content.strip()
+        if clean_json_str.startswith("```"):
+            clean_json_str = clean_json_str.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+        if clean_json_str.startswith("json"):
+            clean_json_str = clean_json_str.split("json", 1)[1].strip()
+        updated_profile = json.loads(clean_json_str)
+
+        # Assert format validity before writing changes
+        if isinstance(updated_profile, dict) and "user_name" in updated_profile:
+            save_user_profile(session_id, updated_profile)
+            trace.append(AIMessage("👤 [PROFILE SUMMARY] Profile verified and updated successfully."))
+    except Exception as e:
+        trace.append(AIMessage(f"👤 [PROFILE SUMMARY] Profile update skipped: {e}"))
+    return {
+        "trace": trace,
+        "final_answer": answer
+    }
+
 # ---------------------------------------------------------------------------
 # Conditional Routing Edges
 # ---------------------------------------------------------------------------
@@ -309,10 +427,8 @@ def route_after_classification(state: AgentState) -> Literal["agent_node", "__en
 
 def route_after_agent(state: AgentState) -> Literal["tool_node", "agent_node", "__end__"]:
     """Evaluates agent thinking states to break out or activate execution nodes."""
-    if state.get("final_answer"):
-        return "__end__"
-    if state.get("iteration", 0) >= MAX_ITERATIONS:
-        return "__end__"
+    if state.get("final_answer") or state.get("iteration", 0) >= MAX_ITERATIONS:
+        return "profile_updater_node"
     if state.get("pending_tool_name"):
         return "tool_node"
     return "agent_node"
@@ -328,6 +444,7 @@ builder = StateGraph(AgentState)
 builder.add_node("router_node", router_node)
 builder.add_node("agent_node", agent_node)
 builder.add_node("tool_node", tool_node)
+builder.add_node("profile_updater_node", profile_updater_node)
 
 # Set Graph Interlinks
 builder.add_edge(START, "router_node")
@@ -343,14 +460,16 @@ builder.add_conditional_edges(
     {
         "tool_node": "tool_node",   # Or whatever your tool node is named
         "agent_node": "agent_node", # ✓ This explicitly enables the self-loop!
-        "__end__": END                  # Maps your end string to the Graph's END
+        "profile_updater_node": "profile_updater_node"                  # Maps your end string to the Graph's END
     }
 )
 
 builder.add_edge("tool_node", "agent_node")
+builder.add_edge("profile_updater_node", END)
 
 # Instantiate memory saver persistence checkpointer
 memory_checkpointer = MemorySaver()
+
 
 # Compile Execution State
 react_agent = builder.compile(checkpointer=memory_checkpointer)
@@ -372,7 +491,8 @@ def run_graph(query: str, session_id: str = "default_session") -> dict:
         "final_answer": "",
         "iteration": 0,
         "pending_tool_name": None,
-        "pending_tool_params": None
+        "pending_tool_params": None,
+        "session_id": session_id,
     }
 
     return react_agent.invoke(initial_state, config=config)

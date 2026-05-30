@@ -45,11 +45,14 @@ STRUCTURED — The query has a concrete, data-driven answer obtainable by queryi
     • "How many rows are in the ORDER category?"
 
 UNSTRUCTURED — The query is open-ended and requires summarisation, narrative, or
-  qualitative analysis of the dataset. Examples:
+  qualitative analysis of the dataset OR questions where the user asks about their own identity, 
+  name, preferences, or what you remember about them.
+  Examples:
     • "Summarise the FEEDBACK category."
     • "How do customer service reps typically respond to cancellation requests?"
     • "What patterns do you notice in shipping complaints?"
     • "Describe how agents handle refund queries."
+    • "What do you remember about me?"
 
 OUT_OF_SCOPE — The query is NOT about the Bitext dataset. It could be answered from
   general world knowledge, or it is a creative/utility request. Examples:
