@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-import pickle
+import sys
 import json
 from typing import Literal, TypedDict, Annotated, Optional, Sequence, Dict, List, Any
 from langgraph.graph import StateGraph, START, END
@@ -14,12 +14,29 @@ from tools import LANGGRAPH_TOOLS, call_tool
 from langchain_core.utils.function_calling import convert_to_openai_tool
 
 
+# ---------------------------------------------------------------------------
+# Tool helpers — use local LANGGRAPH_TOOLS directly (no remote MCP subprocess)
+# ---------------------------------------------------------------------------
+
+def _get_native_tool_schemas() -> List[Dict[str, Any]]:
+    """Convert local LangGraph tools into OpenAI-compatible tool schemas."""
+    return [convert_to_openai_tool(t) for t in LANGGRAPH_TOOLS]
+
+
+def _build_tools_description() -> str:
+    """Build a readable tool description block for system prompts."""
+    desc = []
+    for t in LANGGRAPH_TOOLS:
+        desc.append(f"  • tool: {t.name}\n    description: {t.description}")
+    return "\n".join(desc)
+
 
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
 
 MAX_ITERATIONS = 12  # Hard ceiling; graceful fallback beyond this
+
 
 # ---------------------------------------------------------------------------
 # Graph state
@@ -41,7 +58,6 @@ class AgentState(TypedDict):
 # ---------------------------------------------------------------------------
 # Dynamic Profile File Handling Utilities
 # ---------------------------------------------------------------------------
-
 
 def load_user_profile(session_id: str) -> dict:
     """Reads a persistent user profile from disk. If missing, returns template defaults."""
@@ -65,25 +81,24 @@ def load_user_profile(session_id: str) -> dict:
 def save_user_profile(session_id: str, profile_data: dict) -> None:
     """Saves a user profile payload securely back to disk."""
     path = "profiles.json"
-    if not os.path.exists(path):
-        profiles = {}
-        profiles[session_id] = profile_data
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(profiles, f, indent=2, ensure_ascii=False)
+    profiles = {}
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                profiles = json.load(f)
+        except Exception:
+            pass
+    profiles[session_id] = profile_data
     try:
-        with open(path, "r", encoding="utf-8") as f:
-            profiles = json.load(f)
-            profiles[session_id] = profile_data
         with open(path, "w", encoding="utf-8") as f:
             json.dump(profiles, f, indent=2, ensure_ascii=False)
     except Exception as e:
-        print(f"⚠️ Warning: Failed to write persistent user profile profile: {e}")
+        print(f"⚠️ Warning: Failed to write persistent user profile: {e}")
 
 
 # ---------------------------------------------------------------------------
 # System prompts
 # ---------------------------------------------------------------------------
-
 
 AGENT_SYSTEM_STRUCTURED = """\
 You are an expert data analysis assistant operating in a ReAct (Reason-Action-Observation) framework.
@@ -108,7 +123,7 @@ DATASET SCHEMA — CRITICAL DISTINCTIONS:
   Before calling filter_and_sample or count_rows, ask yourself:
     - Is the value ALL-CAPS (like SHIPPING, ACCOUNT, REFUND)? → put it in `category`
     - Is the value lowercase_snake_case (like track_order)?   → put it in `intent`
-    
+
 WHAT YOU REMEMBER ABOUT THIS USER (PROFILE LAYER)
   User Name: {user_profile_context[user_name]}
   Frequently Asked Topics: {user_profile_context[frequent_topics_or_intents]}
@@ -131,8 +146,15 @@ REACT BEHAVIOR RULES:
 5. Write a structured, human-readable narrative — not a raw data dump.
 
 OUTPUT PROTOCOL:
-When analysis is complete, reply in this exact format:
-FINAL ANSWER: <Your thorough, factually validated narrative here>
+When you have tool results, you MUST present the actual data to the user.
+⛔ NEVER say things like "The function returned X examples" or "The tool found Y rows".
+⛔ NEVER describe or summarize what the tool did — show the actual results.
+✅ If the user asked for examples, show the actual customer messages and agent responses.
+✅ If the user asked for counts, state the number directly.
+✅ If the user asked for categories/intents, list them directly.
+ 
+Reply in this exact format:
+FINAL ANSWER: <present the actual data clearly and directly here>
 """
 
 AGENT_SYSTEM_UNSTRUCTURED = """\
@@ -175,28 +197,11 @@ RULES:
 2. Optionally chain intent_distribution for quantitative support.
 3. Write a structured, human-readable narrative — not a raw data dump.
 4. Every factual claim must be grounded in actual tool results.
+5. If the user ask about their profile, use WHAT YOU REMEMBER ABOUT THIS USER in your answer. DO NOT USE TOOL.
 
 When ready to answer, respond with:
 FINAL ANSWER: <your narrative here>
 """
-
-
-# ---------------------------------------------------------------------------
-# Helper Schema Utilities
-# ---------------------------------------------------------------------------
-
-def _get_native_tool_schemas() -> List[Dict[str, Any]]:
-    """Converts native LangGraph Pydantic tools into compliant tool schemas.
-    """
-    return [convert_to_openai_tool(t) for t in LANGGRAPH_TOOLS]
-
-
-def _build_tools_description() -> str:
-    """Assembles a highly readable text schema summary block for system prompts."""
-    desc = []
-    for t in LANGGRAPH_TOOLS:
-        desc.append(f"  • tool: {t.name}\n    description: {t.description}")
-    return "\n".join(desc)
 
 
 # ---------------------------------------------------------------------------
@@ -241,8 +246,7 @@ def agent_node(state: AgentState) -> dict:
 
     # ── Max Iteration Breaker ──
     if current_iteration > MAX_ITERATIONS:
-        trace.append(SystemMessage("⚠️  [AGENT] Max iterations ({MAX_ITERATIONS}) reached. Returning partial data."))
-        # Safely parse content attributes from real message structures
+        trace.append(SystemMessage(f"⚠️  [AGENT] Max iterations ({MAX_ITERATIONS}) reached. Returning partial data."))
         last_obs = next((m.content for m in reversed(messages) if isinstance(m, ToolMessage)), "No data gathered.")
         return {
             "iteration": current_iteration,
@@ -254,8 +258,41 @@ def agent_node(state: AgentState) -> dict:
 
     # Fetch and stringify user profile attributes dynamically
     profile = load_user_profile(session_id)
-    # profile_str = json.dumps(profile, indent=2, ensure_ascii=False)
 
+    # ── Profile query short-circuit ──────────────────────────────────────────
+    # If the user is asking about themselves/what we remember, answer directly
+    # from the profile without touching any dataset tools.
+    PROFILE_QUERY_PHRASES = [
+        "remember about me", "know about me", "do you know me",
+        "what do you know", "my name", "who am i", "about me",
+        "my preferences", "my interests", "my profile",
+    ]
+    query_lower = state["user_query"].lower()
+    is_profile_query = any(p in query_lower for p in PROFILE_QUERY_PHRASES)
+
+    if is_profile_query:
+        name = profile.get("user_name", "unknown")
+        topics = profile.get("frequent_topics_or_intents", [])
+        prefs = profile.get("user_preferences_and_constraints", [])
+        facts = profile.get("observed_facts", [])
+
+        lines = [f"Here is what I remember about you (session: {session_id}):"]
+        lines.append(f"  • Name: {name}")
+        lines.append(f"  • Frequently explored topics: {', '.join(topics) if topics else 'none recorded yet'}")
+        lines.append(f"  • Preferences / constraints: {', '.join(prefs) if prefs else 'none recorded yet'}")
+        lines.append(f"  • Other observed facts: {', '.join(facts) if facts else 'none recorded yet'}")
+
+        answer = "\n".join(lines)
+        trace.append(AIMessage("👤 [AGENT] Profile query detected — answering from stored profile."))
+        return {
+            "iteration": current_iteration,
+            "trace": trace,
+            "messages": [],
+            "final_answer": answer,
+            "pending_tool_name": None,
+            "pending_tool_params": None,
+        }
+    # ─────────────────────────────────────────────────────────────────────────
 
     # Assemble context layout
     qtype = decision.query_type if decision else QueryType.STRUCTURED
@@ -264,10 +301,10 @@ def agent_node(state: AgentState) -> dict:
 
     native_tools = _get_native_tool_schemas()
 
-    # Generate inference message history (CLEANED: Only calling chat() once)
+    # Generate inference message history
     response = chat(messages, system=system_prompt, max_tokens=1024, temperature=0.0, tools=native_tools)
 
-    # --- LOOP BREAKER SAFEGUARD: Compute look-back status BEFORE modifying message list ---
+    # --- LOOP BREAKER SAFEGUARD ---
     was_last_msg_tool = len(messages) > 0 and isinstance(messages[-1], ToolMessage)
 
     messages.append(response)
@@ -293,6 +330,29 @@ def agent_node(state: AgentState) -> dict:
     if not tool_match and was_last_msg_tool:
         clean_content = response.content.strip()
         if clean_content:
+            # Detect meta-summary language — the model described the tool result
+            # instead of presenting the actual data. Re-prompt it to show the data.
+            META_SUMMARY_PHRASES = [
+                "the function", "the tool", "the provided function",
+                "the result", "returns ", "returned ", "retrieved ",
+                "the examples include", "the data includes", "the output",
+            ]
+            is_meta_summary = any(p in clean_content.lower() for p in META_SUMMARY_PHRASES)
+
+            if is_meta_summary:
+                trace.append(AIMessage(
+                    "⚠️  [AGENT] Meta-summary detected — re-prompting for actual data presentation."
+                ))
+                messages.append(SystemMessage(
+                    content=(
+                        "OBSERVATION: You described what the tool returned instead of presenting "
+                        "the actual data. Do NOT say 'the function returned' or 'the tool found'. "
+                        "Instead, directly show the user the actual examples, numbers, or list from "
+                        "the tool result. Reply with FINAL ANSWER: followed by the real data."
+                    )
+                ))
+                updates["messages"] = messages
+                return updates
             updates["final_answer"] = clean_content
             trace.append(AIMessage("✅ [AGENT] Final answer produced automatically from tool observation data context."))
             return updates
@@ -301,9 +361,9 @@ def agent_node(state: AgentState) -> dict:
         try:
             updates["pending_tool_name"] = tool_match[0]["name"]
             tool_params = tool_match[0]["args"] or {}
-
             updates["pending_tool_params"] = tool_params
-            trace.append(AIMessage(f"🔧 [AGENT] Calling tool: {updates['pending_tool_name']} params={json.dumps(updates['pending_tool_params'])}"))
+            trace.append(AIMessage(
+                f"🔧 [AGENT] Calling tool: {updates['pending_tool_name']} params={json.dumps(updates['pending_tool_params'])}"))
         except Exception as e:
             trace.append(AIMessage(f"⚠️  [AGENT] Parameter parse exception triggered: {e}"))
             messages.append(SystemMessage(
@@ -320,8 +380,105 @@ def agent_node(state: AgentState) -> dict:
     return updates
 
 
+def _format_tool_result(tool_name: str, data: dict) -> str:
+    """
+    Convert a successful tool result dict into clean, readable prose so the LLM
+    receives structured text rather than raw JSON and is not tempted to re-dump it.
+    Falls back to compact JSON for unrecognised shapes.
+    """
+    try:
+        if tool_name == "list_categories":
+            cats = data.get("categories", [])
+            return (
+                    f"The dataset contains {data.get('count', len(cats))} categories:\n"
+                    + "\n".join(f"  • {c}" for c in cats)
+            )
+
+        if tool_name == "list_intents":
+            intents = data.get("intents", [])
+            cat_filter = data.get("category_filter", "ALL")
+            return (
+                    f"Intents under {cat_filter} ({data.get('count', len(intents))} total):\n"
+                    + "\n".join(f"  • {i}" for i in intents)
+            )
+
+        if tool_name == "count_rows":
+            filters = data.get("filters_applied", {})
+            parts = [f"{k}={v}" for k, v in filters.items() if v]
+            label = f" (filters: {', '.join(parts)})" if parts else ""
+            return f"Row count{label}: {data.get('count', '?')} out of {data.get('total_rows', '?')} total rows."
+
+        if tool_name == "filter_and_sample":
+            examples = data.get("examples", [])
+            total = data.get("total_matching", "?")
+            lines = [f"Showing {len(examples)} example(s) — {total} total matching rows:\n"]
+            for i, ex in enumerate(examples, 1):
+                lines.append(f"--- Example {i} ---")
+                lines.append(f"Category : {ex.get('category', '')}")
+                lines.append(f"Intent   : {ex.get('intent', '')}")
+                lines.append(f"Customer : {ex.get('instruction', '')}")
+                lines.append(f"Agent    : {ex.get('response', '')}")
+                lines.append("")
+            return "\n".join(lines)
+
+        if tool_name == "intent_distribution":
+            dist = data.get("distribution", [])
+            cat = data.get("category_filter", "ALL")
+            lines = [f"Intent distribution for {cat} ({data.get('total', '?')} rows total):"]
+            for row in dist:
+                lines.append(f"  • {row['intent']}: {row['count']} rows ({row['pct']}%)")
+            return "\n".join(lines)
+
+        if tool_name == "category_distribution":
+            dist = data.get("distribution", [])
+            lines = [f"Category distribution ({data.get('total', '?')} rows total):"]
+            for row in dist:
+                lines.append(f"  • {row['category']}: {row['count']} rows ({row['pct']}%)")
+            return "\n".join(lines)
+
+        if tool_name in ("summarize_category", "summarize_by_intent"):
+            samples = data.get("sample_conversations", [])
+            header_key = "category" if tool_name == "summarize_category" else "intent_keyword"
+            header_val = data.get(header_key, "")
+            total = data.get("total_rows", "?")
+            lines = [f"Summary data for '{header_val}' — {total} total rows:"]
+            if "intents_breakdown" in data:
+                lines.append("Intent breakdown: " + ", ".join(
+                    f"{k}({v})" for k, v in data["intents_breakdown"].items()
+                ))
+            if "matched_intents" in data:
+                lines.append("Matched intents: " + ", ".join(data["matched_intents"]))
+            lines.append("")
+            for i, ex in enumerate(samples, 1):
+                lines.append(f"--- Sample {i} [{ex.get('intent', '')}] ---")
+                lines.append(f"Customer : {ex.get('customer_message', '')}")
+                lines.append(f"Agent    : {ex.get('agent_response', '')}")
+                lines.append("")
+            return "\n".join(lines)
+
+        if tool_name == "search_keyword":
+            matches = data.get("sample_matches", [])
+            lines = [
+                f"Keyword '{data.get('keyword', '')}' found in {data.get('matches', '?')} rows "
+                f"(column: {data.get('column_searched', '')}):"
+            ]
+            for m in matches:
+                lines.append(f"  • [{m.get('category', '')} / {m.get('intent', '')}] {m.get('instruction', '')}")
+            return "\n".join(lines)
+
+    except Exception:
+        pass  # Fall through to compact JSON
+
+    return json.dumps(data, ensure_ascii=False, indent=2)
+
+
 def tool_node(state: AgentState) -> dict:
-    """Executes the specific structured action tool registered inside the execution loop."""
+    """Executes the tool by name using the local call_tool dispatcher.
+
+    For tools that return directly displayable data (list, count, sample, distribution),
+    the formatted result is set as final_answer immediately — no second LLM call needed.
+    For summarization tools the result goes into a ToolMessage so the LLM can narrate it.
+    """
     tool_name = state.get("pending_tool_name")
     tool_params = state.get("pending_tool_params") or {}
     trace = []
@@ -330,40 +487,58 @@ def tool_node(state: AgentState) -> dict:
     if not tool_name:
         return {}
 
-    # 1. Inspect recent runtime historical items to bind accurate tool transaction IDs
+    # Tools whose output IS the answer — no LLM narration pass needed.
+    DIRECT_ANSWER_TOOLS = {
+        "list_categories",
+        "list_intents",
+        "count_rows",
+        "filter_and_sample",
+        "intent_distribution",
+        "category_distribution",
+        "search_keyword",
+    }
+
+    # Bind the tool_call_id from the last AI message
     last_ai_message = messages[-1] if messages else None
-    tool_call_id = "default_id"
-    if last_ai_message and hasattr(last_ai_message, "tool_calls") and last_ai_message.tool_calls:
-        tool_call_id = last_ai_message.tool_calls[0]["id"]
-
-    # 2. Dispatch dynamic utility execution pipeline
-    raw_result = call_tool(tool_name, tool_params)
-    result_dict = json.loads(raw_result)
-
-    if result_dict.get("success", False):
-        obs_content = json.dumps(result_dict['data'], indent=2)
-        trace.append(AIMessage(f"📊 [TOOL]  {tool_name} → success"))
-    else:
-        obs_content = f"Error: {result_dict.get('error')}"
-        trace.append(AIMessage(f"❌ [TOOL]  {tool_name} → error: {result_dict.get('error')}"))
-
-    # 3. Instantiate strict ToolMessage objects tracking back to our context call index
-    tool_message = ToolMessage(
-        content=obs_content,
-        name=tool_name,
-        tool_call_id=tool_call_id
+    tool_call_id = (
+        last_ai_message.tool_calls[0]["id"]
+        if last_ai_message and getattr(last_ai_message, "tool_calls", None)
+        else "default_id"
     )
 
-    return {
+    try:
+        raw_result = call_tool(tool_name, tool_params)
+        parsed = json.loads(raw_result)
+        if parsed.get("success") and parsed.get("data"):
+            formatted = _format_tool_result(tool_name, parsed["data"])
+        elif not parsed.get("success"):
+            formatted = f"Tool error: {parsed.get('error', 'unknown error')}"
+        else:
+            formatted = raw_result
+        trace.append(AIMessage(f"📊 [TOOL] {tool_name} → success"))
+    except Exception as ex:
+        formatted = f"Error: {ex}"
+        trace.append(AIMessage(f"❌ [TOOL] {tool_name} → error: {ex}"))
+
+    tool_message = ToolMessage(content=formatted, name=tool_name, tool_call_id=tool_call_id)
+
+    result = {
         "trace": trace,
         "messages": [tool_message],
         "pending_tool_name": None,
-        "pending_tool_params": None
+        "pending_tool_params": None,
     }
+
+    # For direct-answer tools, set final_answer now — skip the next agent_node call.
+    if tool_name in DIRECT_ANSWER_TOOLS and not formatted.startswith("Tool error"):
+        trace.append(AIMessage("✅ [TOOL] Direct answer ready — skipping LLM narration pass."))
+        result["final_answer"] = formatted
+
+    return result
 
 
 def profile_updater_node(state: AgentState) -> dict:
-    """Analyses the latest conversation turn to dynamically condense, expand, and update the profile json database."""
+    """Analyses the latest conversation turn to dynamically update the profile."""
     session_id = state.get("session_id", "default_session")
     query = state["user_query"]
     answer = state.get("final_answer", "")
@@ -386,7 +561,6 @@ def profile_updater_node(state: AgentState) -> dict:
     payload = f"Current Profile:\n{json.dumps(current_profile)}\n\nTurn Info:\nUser Question: {query}\nAgent Answer: {answer}"
 
     try:
-        # Use single chat lookup to produce updated JSON
         updater_response = chat(
             messages=[HumanMessage(content=payload)],
             system=profile_sys_prompt,
@@ -394,7 +568,6 @@ def profile_updater_node(state: AgentState) -> dict:
             temperature=0.0
         )
 
-        # Clean text markup wrappers if the model generated any backticks
         clean_json_str = updater_response.content.strip()
         if clean_json_str.startswith("```"):
             clean_json_str = clean_json_str.split("\n", 1)[1].rsplit("```", 1)[0].strip()
@@ -402,16 +575,17 @@ def profile_updater_node(state: AgentState) -> dict:
             clean_json_str = clean_json_str.split("json", 1)[1].strip()
         updated_profile = json.loads(clean_json_str)
 
-        # Assert format validity before writing changes
         if isinstance(updated_profile, dict) and "user_name" in updated_profile:
             save_user_profile(session_id, updated_profile)
             trace.append(AIMessage("👤 [PROFILE SUMMARY] Profile verified and updated successfully."))
     except Exception as e:
         trace.append(AIMessage(f"👤 [PROFILE SUMMARY] Profile update skipped: {e}"))
+
     return {
         "trace": trace,
         "final_answer": answer
     }
+
 
 # ---------------------------------------------------------------------------
 # Conditional Routing Edges
@@ -425,12 +599,19 @@ def route_after_classification(state: AgentState) -> Literal["agent_node", "__en
     return "agent_node"
 
 
-def route_after_agent(state: AgentState) -> Literal["tool_node", "agent_node", "__end__"]:
+def route_after_agent(state: AgentState) -> Literal["tool_node", "agent_node", "profile_updater_node"]:
     """Evaluates agent thinking states to break out or activate execution nodes."""
     if state.get("final_answer") or state.get("iteration", 0) >= MAX_ITERATIONS:
         return "profile_updater_node"
     if state.get("pending_tool_name"):
         return "tool_node"
+    return "agent_node"
+
+
+def route_after_tool(state: AgentState) -> Literal["agent_node", "profile_updater_node"]:
+    """If tool_node already set a final_answer, skip agent_node and go straight to profile update."""
+    if state.get("final_answer"):
+        return "profile_updater_node"
     return "agent_node"
 
 
@@ -440,13 +621,11 @@ def route_after_agent(state: AgentState) -> Literal["tool_node", "agent_node", "
 
 builder = StateGraph(AgentState)
 
-# Append Graph Nodes
 builder.add_node("router_node", router_node)
 builder.add_node("agent_node", agent_node)
 builder.add_node("tool_node", tool_node)
 builder.add_node("profile_updater_node", profile_updater_node)
 
-# Set Graph Interlinks
 builder.add_edge(START, "router_node")
 
 builder.add_conditional_edges(
@@ -458,20 +637,24 @@ builder.add_conditional_edges(
     "agent_node",
     route_after_agent,
     {
-        "tool_node": "tool_node",   # Or whatever your tool node is named
-        "agent_node": "agent_node", # ✓ This explicitly enables the self-loop!
-        "profile_updater_node": "profile_updater_node"                  # Maps your end string to the Graph's END
+        "tool_node": "tool_node",
+        "agent_node": "agent_node",
+        "profile_updater_node": "profile_updater_node"
     }
 )
 
-builder.add_edge("tool_node", "agent_node")
+builder.add_conditional_edges(
+    "tool_node",
+    route_after_tool,
+    {
+        "agent_node": "agent_node",
+        "profile_updater_node": "profile_updater_node",
+    }
+)
+
 builder.add_edge("profile_updater_node", END)
 
-# Instantiate memory saver persistence checkpointer
 memory_checkpointer = MemorySaver()
-
-
-# Compile Execution State
 react_agent = builder.compile(checkpointer=memory_checkpointer)
 
 
@@ -481,7 +664,6 @@ react_agent = builder.compile(checkpointer=memory_checkpointer)
 
 def run_graph(query: str, session_id: str = "default_session") -> dict:
     """Executes the structured LangGraph engine with thread-bound persistence."""
-
     config = {"configurable": {"thread_id": session_id}}
     initial_state: AgentState = {
         "user_query": query,

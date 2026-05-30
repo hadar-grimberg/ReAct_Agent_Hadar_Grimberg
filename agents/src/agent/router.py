@@ -53,6 +53,10 @@ UNSTRUCTURED — The query is open-ended and requires summarisation, narrative, 
     • "What patterns do you notice in shipping complaints?"
     • "Describe how agents handle refund queries."
     • "What do you remember about me?"
+    • "What do you know about me?"
+    • "Who am I?"
+    • "What is my name?"
+    • "What are my preferences?"
 
 OUT_OF_SCOPE — The query is NOT about the Bitext dataset. It could be answered from
   general world knowledge, or it is a creative/utility request. Examples:
@@ -112,7 +116,12 @@ def _heuristic_classify(query: str) -> QueryType:
     }
     summarise_keywords = {"summarise", "summarize", "describe", "explain", "patterns",
                           "typically", "how do", "what kind"}
+    profile_keywords = {"remember about me", "know about me", "who am i", "my name",
+                        "about me", "my preferences", "my interests", "my profile",
+                        "do you know me", "what do you know"}
 
+    if any(k in q for k in profile_keywords):
+        return QueryType.UNSTRUCTURED
     if any(k in q for k in summarise_keywords):
         return QueryType.UNSTRUCTURED
     if any(k in q for k in dataset_keywords):
